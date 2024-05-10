@@ -131,7 +131,8 @@ def get_country_by_status(status=""):
     
     # 读取Excel文件
     filtered_df = None
-    df = read_xlsx('./data/01-GL20货币开发状态.xlsx', header=0)
+    
+    df = read_xlsx("D:\\200_WL\\298_外国货币信息\世界货币信息统计\\01-双CIS货币开发状态\\01-GL20货币开发状态.xlsx", header=0)
     df = df[["国家和地区", "ISO代码", "软件开发状态", "货币状态", "鉴伪状态", "备注"]]
 
     # 使用 apply 方法调用 is_english 函数，创建一个新的列来表示是否是英文字符
@@ -292,6 +293,8 @@ def main():
         border: 2px solid #cccccc;  /* 添加边框 */
         padding: 5px;               /* 设置内边距 */
         border-radius: 4px;         /* 边框圆角 */
+        min-width: 200px;           /* 设置最小宽度 */
+        white-space: pre;           /* 保持文本换行 */
       """,
       max_width=800,
   )

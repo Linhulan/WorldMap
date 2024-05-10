@@ -203,6 +203,9 @@ devlopping_half = get_country_by_status(1)      # 红色
 devlopping_lack_new = get_country_by_status(2)  # 黄色
 devlopping_lack_old = get_country_by_status(3)  # 淡绿
 developed = get_country_by_status(4)            # 深绿
+# customer_auth = get_country_by_status(5)        # 蓝色
+# official_auth = get_country_by_status(6)        # 紫色
+
 
 status = 0
 
@@ -261,7 +264,7 @@ def main():
   map = folium.Map(location=[0, 0], zoom_start=2)
   create_jawg_sunny_TileLayer().add_to(map)
 
-  fg = folium.FeatureGroup(name="Icon collection", show=True).add_to(map)
+  fg = folium.FeatureGroup(name="Icon collection", show=False).add_to(map)
   folium.Marker(location=(0, 0)).add_to(fg)
 
   # with open('./data/world.zh.json', 'r', encoding="utf-8") as file:

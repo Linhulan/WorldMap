@@ -132,13 +132,13 @@ def get_country_by_status(status=""):
     # 读取Excel文件
     filtered_df = None
     df = read_xlsx('./data/01-GL20货币开发状态.xlsx', header=0)
-    df = df[["国家和地区", "ISO代码", "软件开发状态", "货币状态", "鉴伪状态"]]
+    df = df[["国家和地区", "ISO代码", "软件开发状态", "货币状态", "鉴伪状态", "备注"]]
 
     # 使用 apply 方法调用 is_english 函数，创建一个新的列来表示是否是英文字符
     df['is_english'] = df['ISO代码'].apply(is_english)
 
     if status == "":
-      return df["国家和地区"].to_list()
+      return df
     elif status == 0:
       filtered_df = df[ (df["is_english"]) 
                   & (df["软件开发状态"]).isna()
@@ -222,27 +222,27 @@ def country_style(feature):
     #    print(country)
     #    color = '#00ff00'
 
-    if status==0 and fuzz_match(country, undevlop):
+    if fuzz_match(country, undevlop):
         print(country)
         print("原色\r\n")
         color = '#ffffff'
 
-    if status==1 and fuzz_match(country, devlopping_half):
+    if fuzz_match(country, devlopping_half):
         print(country)
         print("红色\r\n")
         color = '#ff0000'
         
-    if status==2 and fuzz_match(country, devlopping_lack_new):
+    if fuzz_match(country, devlopping_lack_new):
         print(country)
         print("黄色\r\n")
         color = '#ffff00'
         
-    if status==3 and fuzz_match(country, devlopping_lack_old):
+    if fuzz_match(country, devlopping_lack_old):
         print(country)
         print("淡绿\r\n")
         color = '#99ff99'
         
-    if status==4 and fuzz_match(country, developed):
+    if fuzz_match(country, developed):
         print(country)
         print("绿色\r\n")
         color = '#00ff00'
@@ -263,44 +263,57 @@ def main():
   fg = folium.FeatureGroup(name="Icon collection", show=True).add_to(map)
   folium.Marker(location=(0, 0)).add_to(fg)
 
+  # with open('./data/world.zh.json', 'r', encoding="utf-8") as file:
+  #   geo_json_data  = json.load(file)
+
   with open('./data/world.zh.json', 'r', encoding="utf-8") as file:
     geo_json_data  = json.load(file)
+    world = geopandas.GeoDataFrame.from_features(geo_json_data, crs="EPSG:4326")
+    print(world.shape)
 
+    global all_countries
+    worldmerge =  world.merge(all_countries, how='left', left_on='name', right_on='国家和地区')
+    # worldmerge.to_csv('./data/worldmerge.csv', index=False)
+    print(worldmerge.shape)
 
   global status
-
   status = 0
+
+  tooltip = folium.GeoJsonTooltip(
+      fields=["name","ISO代码", "软件开发状态", "货币状态", "鉴伪状态", "备注"],
+      aliases=["国家:", "货币:", "软件状态:", "货币状态:", "鉴伪状态:", "备注:"],
+      localize=True,
+      sticky=False,
+      labels=True,
+      style="""
+        font-size:14px;             /* 修改字体大小 */
+        font-family:Arial;          /* 设置字体类型 */
+        background-color: #F0EFEF;  /* 设置背景颜色 */
+        border: 2px solid #cccccc;  /* 添加边框 */
+        padding: 5px;               /* 设置内边距 */
+        border-radius: 4px;         /* 边框圆角 */
+      """,
+      max_width=800,
+  )
+
+
   color_undev = folium.FeatureGroup(name="未开发", show=True).add_to(map)
   folium.GeoJson(
-      geo_json_data, 
-      name="未开发",
-      style_function=country_style
+      worldmerge, 
+      name = "未开发",
+      tooltip = tooltip,
+      style_function = country_style,
+      highlight_function = lambda feature: {
+        "fillOpacity": 0.7,
+      },
     ).add_to(color_undev)
 
-  status = 1
-  color_deving_half = folium.FeatureGroup(name="缺一半货币", show=True).add_to(map)
-  folium.GeoJson(
-      geo_json_data, 
-      name="缺一半货币",
-      style_function=country_style
-    ).add_to(color_deving_half)
-
-  colormap = branca.colormap.LinearColormap(
-    colors=["#ffffff", "#ff0000", "#ffff00", "#99ff99", "#00ff00"],
-    caption="State Level Median County Household Income (%)",
-  )
-  colormap.add_to(map)
-
-  # 增加点击事件
-  map.add_child(
-    folium.DevStatusPopup()
-  )
   # 增加搜索框
   folium.plugins.Geocoder().add_to(map)
   # 增加图层控制器
   folium.LayerControl().add_to(map)
 
-  map.save("basic_map.html")
+  map.save("index.html")
 
 def test_fuzz_match():
    while True:
@@ -314,6 +327,8 @@ def test_fuzz_match():
       if fuzz_match(country, devlopping_lack_old):
         print("淡绿\r\n")
 
+import geopandas
+
 if __name__ == "__main__":
   main()
   # test_fuzz_match()
@@ -325,3 +340,18 @@ if __name__ == "__main__":
 
 
   # print(get_country_by_status(2))
+
+  # with open('./data/world.zh.json', 'r', encoding="utf-8") as file:
+  #   geo_json_data  = json.load(file)
+  #   world = geopandas.GeoDataFrame.from_features(geo_json_data, crs="EPSG:4326")
+  #   print(world.shape)
+
+  #   all_countries2 = all_countries[["国家和地区", "软件开发状态", "货币状态", "鉴伪状态"]]
+  #   worldmerge =  world.merge(all_countries2, how='left', left_on='name', right_on='国家和地区')
+  #   # worldmerge.to_csv('./data/worldmerge.csv', index=False)
+  #   print(worldmerge.shape)
+
+
+
+
+

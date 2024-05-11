@@ -8,6 +8,7 @@ import requests
 import pandas as pd
 import json
 import branca
+import geopandas
 from fuzzywuzzy import process
 from openpyxl import load_workbook
 from xlrd import open_workbook
@@ -48,58 +49,6 @@ def read_xls(file, sheet_name=None, header=None):
             bottom_row -= header + 1
         df.iloc[top_row:bottom_row, top_col:bottom_col] = base_value
     return df
-
-
-class WorldMap:
-  
-  def __init__(self, location=None, zoom_start=10, tiles=None):
-    accessToken = '8wpMncgJdplYGie68vZuWguQqxbGTmUpa8wkcu775mrZNfBRdjWsg761NBsrUQoW'
-    tile = 'https://tile.jawg.io/jawg-sunny/{z}/{x}/{y}{r}.png?access-token=8wpMncgJdplYGie68vZuWguQqxbGTmUpa8wkcu775mrZNfBRdjWsg761NBsrUQoW'
-    attr = 'jawg-sunny'
-    self.map = folium.Map(zoom_start=zoom_start,
-                          location=location,
-                          tiles=tile, 
-                          attr=attr
-                        )
-  
-  def add_layer(self, lat=None, lon=None, popup=None):
-    geojson_data = requests.get(
-        "https://raw.githubusercontent.com/python-visualization/folium-example-data/main/world_countries.json"
-    ).json()
-
-    folium.GeoJson(geojson_data, name="hello world").add_to(map)
-    folium.LayerControl().add_to(map)
-
-  def get_map(self):
-    return self.map
-  
-  def save(self, filename):
-    self.map.save(filename)
-  
-  def test_choropleth(self):
-    with open("./us_states.json", "r") as f:
-      state_geo = json.load(f)
-
-    state_data = pd.read_csv(
-        'us_unemployment_oct_2012.csv'
-    )
-
-    m = self.map
-
-    folium.Choropleth(
-        geo_data=state_geo,
-        name="choropleth",
-        data=state_data,
-        columns=["State", "Unemployment"],
-        key_on="feature.id",
-        fill_color="YlGn",
-        fill_opacity=0.7,
-        line_opacity=0.2,
-        legend_name="Unemployment Rate (%)",
-    ).add_to(m)
-
-    folium.LayerControl().add_to(m)
-    self.map = m
 
 def create_jawg_sunny_TileLayer(zoom_start=10, location=None):
   accessToken = '8wpMncgJdplYGie68vZuWguQqxbGTmUpa8wkcu775mrZNfBRdjWsg761NBsrUQoW'
@@ -254,7 +203,7 @@ def country_style(feature):
     return {
         'fillColor': color,
         'color': 'black',
-        'fillOpacity': 0.5,
+        'fillOpacity': 0.3,
         'weight': 1,
         'dashArray': '5, 5',
     }
@@ -303,14 +252,14 @@ def main():
   )
 
 
-  color_undev = folium.FeatureGroup(name="未开发", show=True).add_to(map)
+  color_undev = folium.FeatureGroup(name="开发状态", show=True).add_to(map)
   folium.GeoJson(
       worldmerge, 
       name = "未开发",
       tooltip = tooltip,
       style_function = country_style,
       highlight_function = lambda feature: {
-        "fillOpacity": 0.7,
+        "fillOpacity": 0.6,
       },
     ).add_to(color_undev)
 
@@ -333,7 +282,7 @@ def test_fuzz_match():
       if fuzz_match(country, devlopping_lack_old):
         print("淡绿\r\n")
 
-import geopandas
+
 
 if __name__ == "__main__":
   main()

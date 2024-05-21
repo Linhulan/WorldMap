@@ -268,7 +268,7 @@ def main():
   # 增加图层控制器
   folium.LayerControl().add_to(map)
 
-  map.save("index.html")
+  map.save("map.html")
 
 def test_fuzz_match():
    while True:

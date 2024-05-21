@@ -227,8 +227,13 @@ def main():
     global all_countries
     worldmerge =  world.merge(all_countries, how='left', left_on='name', right_on='国家和地区')
     # worldmerge.to_csv('./data/worldmerge.csv', index=False)
-    print(worldmerge.shape)
-
+    # print(worldmerge.head())
+  #   honkong = all_countries[all_countries['国家和地区'] == '中国香港']
+  #   print(honkong)
+  #   taiwan = all_countries[all_countries['国家和地区'] == '中国台湾']
+  #   print(taiwan)
+  # return
+  
   global status
   status = 0
 

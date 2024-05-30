@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+        }
+        .login-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 0 15px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            color: #666;
+        }
+        input {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px;
+            background-color: #9b59b6;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #8e44ad;
+        }
+        .dingtalk-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        .dingtalk-button:hover {
+            background-color: #0056b3;
+        }
+        .dingtalk-button img {
+            width: 40px;
+            height: 40px;
+            margin-right: 8px;
+        }
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .login-container {
+                padding: 20px;
+            }
+            h2 {
+                font-size: 24px;
+            }
+            input, button, .dingtalk-button {
+                font-size: 14px;
+                padding: 8px;
+            }
+            .dingtalk-button img {
+                width: 18px;
+                height: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="login-form">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required pattern="[a-zA-Z0-9]+">
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required pattern=".{8,}">
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <button class="dingtalk-button" onclick="loginWithDingTalk()">
+            <img src="./data/钉钉2.png" alt="DingTalk Icon"> Login with DingTalk
+        </button>
+    </div>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            // Basic client-side validation
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username && password) {
+                // Hashing password client-side before sending to the server (not recommended, should be done server-side)
+                const hashedPassword = btoa(password);
+                // Sending login request to the server (Replace 'login_endpoint' with actual endpoint)
+                fetch('login_endpoint', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password: hashedPassword })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = 'map.html';
+                    } else {
+                        alert('Invalid credentials');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            } else {
+                alert('Please fill in all fields');
+            }
+        });
+
+        function loginWithDingTalk() {
+            const appId = 'YOUR_APP_ID';
+            const redirectUri = encodeURIComponent('http://localhost:8000/callback');
+            const loginUrl = `https://oapi.dingtalk.com/connect/oauth2/sns_authorize?appid=${appId}&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=${redirectUri}`;
+            window.location.href = loginUrl;
+        }
+    </script>
+</body>
+</html>

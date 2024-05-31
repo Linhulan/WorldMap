@@ -9,7 +9,6 @@
     <!-- <link rel="stylesheet" href="style.css"> -->
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <script src='dist/jsOTP.min.js'></script>
-    <script src='js/a.js'></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500&display=swap');
 
@@ -260,7 +259,7 @@
                     <h1>Welcome to<br>Union WorldMap</h1>
                     <div style="display: flex; justify-content: space-between;">
                         <p>如果你没有账号<br>可以<a id="register" href="#">点击这里</a>进行注册.</p>
-                        <img id="qrcode" src="./data/2FA_OTP.png" width="128" height="128" alt="2FA_OTP">
+                        <img style="display: none;" id="qrcode" src="./data/2FA_OTP.png" width="128" height="128" alt="2FA_OTP">
                         <div></div>
                     </div>
                 </div>
@@ -296,58 +295,6 @@
             </div>
         </div>
     </div>
+    <script src='js/a.js'></script>
 </body>
-
-
-<script>
-    document.getElementById('register').addEventListener('click', function () {
-        // toggle二维码
-        let qrcode = document.getElementById('qrcode');
-        if (qrcode.style.display === 'none') {
-            qrcode.style.display = 'block';
-        } else {
-            qrcode.style.display = 'none';
-        }
-    });
-
-    document.getElementById('login-form').addEventListener('submit', function (event) {
-        event.preventDefault();
-        // Basic client-side validation
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        const verify = document.getElementById('verify').value;
-        if (username.trim() === '' || password.trim() === '') {
-            alert('Please enter both username and password');
-            return;
-        }
-        // Here you would normally submit the form to the server
-        // For demonstration purposes, we'll just log the data to the console
-        console.log('Username:', username);
-        console.log('Password:', password);
-        console.log('verify:', verify);
-        // totp
-        var totp = new jsOTP.totp();
-        var timeCode = totp.getOtp("JBSWY3DPEHPK3PXP");
-        // console.log(timeCode);
-
-        let login_flag = false;
-        if (username === 'union' && password === 'wl012345') {
-            login_flag = true;
-        } else if (verify != timeCode) {
-            alert('验证码错误');
-            return;
-        } else if (username === 'wl' && password === 'wl290gdf43.28') {
-            login_flag = true;
-        } else {
-            login_flag = false;
-        }
-        
-        if (login_flag) {
-            window.location.href = 'map.html';
-        } else {
-            alert('用户名或密码错误');
-        }
-    });
-</script>
-
 </html>

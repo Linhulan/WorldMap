@@ -119,6 +119,10 @@ def get_country_by_status(status=""):
                   & (df["货币状态"]).isna()
                   & (df["鉴伪状态"]).isna()
           ]
+    elif status == 5:
+      filtered_df = df[ (df["is_english"]) 
+                  & (df["备注"]).str.contains("不流通")
+          ]
     
     return filtered_df["国家和地区"]
     
@@ -152,6 +156,7 @@ devlopping_half = get_country_by_status(1)      # 红色
 devlopping_lack_new = get_country_by_status(2)  # 黄色
 devlopping_lack_old = get_country_by_status(3)  # 淡绿
 developed = get_country_by_status(4)            # 深绿
+not_circulate = get_country_by_status(5)            # 深绿
 # customer_auth = get_country_by_status(5)        # 蓝色
 # official_auth = get_country_by_status(6)        # 紫色
 
@@ -208,6 +213,26 @@ def country_style(feature):
         'dashArray': '5, 5',
     }
 
+def style_not_circulate(feature):
+  global not_circulate
+  country = feature['properties']['name']
+  color = '#ffffff'
+
+  skip_list = ['俄罗斯']
+     
+  if fuzz_match(country, not_circulate) & (country not in skip_list):
+    print(country)
+    print("不流通 红色\r\n")
+    color = '#ff0000'
+  
+  return {
+    'fillColor': color,
+    'color': 'black',
+    'fillOpacity': 0.3,
+    'weight': 1,
+    'dashArray': '5, 5',
+  }
+
 
 def main():
   map = folium.Map(location=[0, 0], zoom_start=2)
@@ -256,17 +281,46 @@ def main():
       max_width=800,
   )
 
+  not_circulate_tooltip = folium.GeoJsonTooltip(
+      fields=["name","ISO代码", "软件开发状态", "货币状态", "鉴伪状态", "备注"],
+      aliases=["国家:", "货币:", "软件状态:", "货币状态:", "鉴伪状态:", "备注:"],
+      localize=True,
+      sticky=False,
+      labels=True,
+      style="""
+        font-size:14px;             /* 修改字体大小 */
+        font-family:Arial;          /* 设置字体类型 */
+        background-color: #F0EFEF;  /* 设置背景颜色 */
+        border: 2px solid #cccccc;  /* 添加边框 */
+        padding: 5px;               /* 设置内边距 */
+        border-radius: 4px;         /* 边框圆角 */
+        min-width: 200px;           /* 设置最小宽度 */
+        white-space: pre;           /* 保持文本换行 */
+      """,
+      max_width=800,
+  )
 
   color_undev = folium.FeatureGroup(name="开发状态", show=True).add_to(map)
   folium.GeoJson(
       worldmerge, 
-      name = "未开发",
+      name = "开发状态",
       tooltip = tooltip,
       style_function = country_style,
       highlight_function = lambda feature: {
         "fillOpacity": 0.6,
       },
     ).add_to(color_undev)
+  
+  color_not_circulate = folium.FeatureGroup(name="不流通货币", show=False).add_to(map)
+  folium.GeoJson(
+      worldmerge, 
+      name = "不流通货币",
+      tooltip = not_circulate_tooltip,
+      style_function = style_not_circulate,
+      highlight_function = lambda feature: {
+        "fillOpacity": 0.6,
+      },
+    ).add_to(color_not_circulate)
 
   # 增加搜索框
   folium.plugins.Geocoder().add_to(map)
@@ -291,6 +345,10 @@ def test_fuzz_match():
 
 if __name__ == "__main__":
   main()
+  # print (not_circulate)
+  # print(all_countries.head())
+  # print(enumerate(all_countries['备注']))
+
   # test_fuzz_match()
   # print(get_country_by_status(0).shape)
   # print(get_country_by_status(1).shape)

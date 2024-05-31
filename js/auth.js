@@ -8,6 +8,7 @@ function isLoggedIn() {
 function hasPermission(page) {
     item = JSON.parse(localStorage.getItem('item'));
     permissions = item.permissions;
+    console.log(page)
     return permissions && permissions.includes(page);
 }
 

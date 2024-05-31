@@ -328,6 +328,8 @@ def main():
   folium.LayerControl().add_to(map)
 
   map.save("map.html")
+  # TODO: 增加验证功能
+  # <script src="/js/auth.js"></script>
 
 def test_fuzz_match():
    while True:

@@ -1,15 +1,14 @@
 // 检查用户是否已登录
 function isLoggedIn() {
     item = JSON.parse(localStorage.getItem('item'));
-    return item.isLoggedIn === 'true';
+    return item && item.isLoggedIn === 'true';
 }
 
 // 检查用户是否有访问该页面的权限
 function hasPermission(page) {
     item = JSON.parse(localStorage.getItem('item'));
-    permissions = item.permissions;
-    console.log(page)
-    return permissions && permissions.includes(page);
+    const permissions = item ? item.permissions : [];
+    return permissions.includes(page);
 }
 
 function checkExpire() {

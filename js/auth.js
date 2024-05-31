@@ -14,7 +14,7 @@ function hasPermission(page) {
 function checkExpire() {
     const currentTime = new Date().getTime();
     item = JSON.parse(localStorage.getItem('item'));
-    if ( item ) {
+    if ( !item ) {
         return false;
     }
     const expireTime = item.expiry;

@@ -31,18 +31,19 @@ function checkExpire() {
 function checkAccess() {
     const currentPath = window.location.pathname;
 
-    if (!checkExpire()) {
-        alert('Your session has expired. Please log in again.');
-        window.location.href = '/index.html';
-        return;
-    }
-
     if (!isLoggedIn()) {
-        alert('You are not logged in!');
+        alert('你还没登录，请先登录！');
         window.location.href = '/index.html';
         return;
     }
 
+    if (!checkExpire()) {
+        alert('登录信息过期，请重新登录！');
+        window.location.href = '/index.html';
+        return;
+    }
+
+    
     if (!hasPermission(currentPath)) {
         alert('You do not have permission to access this page!');
         window.location.href = '/unauthorized.html'; // 未授权页面

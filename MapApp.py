@@ -12,6 +12,7 @@ import geopandas
 from fuzzywuzzy import process
 from openpyxl import load_workbook
 from xlrd import open_workbook
+from bs4 import BeautifulSoup
 
 def read_xlsx(file, sheet_name=None, header=None):
     """读取 xlsx 格式文件。"""
@@ -233,6 +234,25 @@ def style_not_circulate(feature):
     'dashArray': '5, 5',
   }
 
+def add_auth2html(html_file: str):
+
+  html_file_path = html_file
+  new_script_tag_content = '<script src="/js/auth.js"></script>'
+
+  with open(html_file_path, 'r', encoding='utf-8') as file:
+      soup = BeautifulSoup(file, 'lxml')
+
+  # 在<head>标签内的最上方插入新的<script>标签
+  head = soup.find('head')
+  if head:
+      head.insert(0, BeautifulSoup(new_script_tag_content, 'html.parser'))
+
+  # 将修改后的内容写回文件
+  with open(html_file_path, 'w', encoding='utf-8') as file:
+      file.write(str(soup.prettify()))
+
+  print("Script tag added successfully.")
+
 
 def main():
   map = folium.Map(location=[0, 0], zoom_start=2)
@@ -328,8 +348,7 @@ def main():
   folium.LayerControl().add_to(map)
 
   map.save("map.html")
-  # TODO: 增加验证功能
-  # <script src="/js/auth.js"></script>
+  add_auth2html("map.html")
 
 def test_fuzz_match():
    while True:

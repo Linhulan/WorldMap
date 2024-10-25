@@ -124,6 +124,12 @@ def get_country_by_status(status=""):
       filtered_df = df[ (df["is_english"]) 
                   & (df["备注"]).str.contains("不流通")
           ]
+    elif status == 6:
+      filtered_df = df[ (df["is_english"]) 
+                  & (df["软件开发状态"] == "初步开发") 
+                  & (df["货币状态"]).isna()
+                  & (df["鉴伪状态"]).isin(["鉴伪不全", "未做鉴伪"])
+          ]
     
     return filtered_df["国家和地区"]
     
@@ -158,7 +164,8 @@ devlopping_lack_new = get_country_by_status(2)  # 黄色
 devlopping_lack_old = get_country_by_status(3)  # 淡绿
 developed = get_country_by_status(4)            # 深绿
 not_circulate = get_country_by_status(5)            # 深绿
-# customer_auth = get_country_by_status(5)        # 蓝色
+developping_lack_counterfeit = get_country_by_status(6)  # 蓝色
+# customer_auth = get_country_by_status(5)        
 # official_auth = get_country_by_status(6)        # 紫色
 
 
@@ -171,6 +178,7 @@ def country_style(feature):
     global devlopping_lack_new            # 黄色
     global devlopping_lack_old            # 淡绿
     global developed                      # 深绿
+    global developping_lack_counterfeit   # 蓝色
     global status
     country = feature['properties']['name']
     color = '#ffffff'
@@ -201,6 +209,11 @@ def country_style(feature):
         print("淡绿\r\n")
         color = '#99ff99'
         
+    if fuzz_match(country, developping_lack_counterfeit):
+        print(country)
+        print("紫色\r\n")
+        color = '#5629af'
+
     if fuzz_match(country, developed):
         print(country)
         print("绿色\r\n")

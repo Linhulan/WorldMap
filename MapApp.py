@@ -116,10 +116,10 @@ def get_country_by_status(status=""):
           ]
     elif status == 4:
       filtered_df = df[ (df["is_english"]) 
-                  & (df["软件开发状态"]).isin(["初步开发", "客户认证", "官方认证"])
-                  & (df["货币状态"]).isna()
-                  & (df["鉴伪状态"]).isna()
-          ]
+                & (df["软件开发状态"]).isin(["初步开发", "客户认证", "官方认证"])
+                & ((df["货币状态"]).isna() | (df["货币状态"] == "") | (df["货币状态"].str.isspace()))
+                & (df["鉴伪状态"]).isna()
+            ]
     elif status == 5:
       filtered_df = df[ (df["is_english"]) 
                   & (df["备注"]).str.contains("不流通")
